@@ -13,6 +13,15 @@ class Product(models.Model):
     class Meta:
         ordering = ["name"]
 
+    @property
+    def description_short(self) -> str:
+        if len(self.description) < 50:
+            return self.description
+        return self.description[:50] + "..."
+
+    def __str__(self) -> str:
+        return f"Product(pk={self.pk}), name={self.name!r}"
+
 
 class Order(models.Model):
     delivery_address = models.TextField(null=True, blank=True)
