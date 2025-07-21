@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpRequest
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.views import View
 
 from shopapp.models import Product, Order
 from shopapp.forms import ProductForm, OrderForm
@@ -16,6 +17,15 @@ def products_list(request: HttpRequest) -> HttpResponse:
         "products": Product.objects.all(),
     }
     return render(request, "shopapp/products_list.html", context=context)
+
+
+class ProductDetailsView(View):
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        product = get_object_or_404(Product, pk=pk)
+        context = {
+            "product": product,
+        }
+        return render(request, "shopapp/product_detail.html", context=context)
 
 
 def orders_list(request: HttpRequest) -> HttpResponse:
@@ -38,6 +48,7 @@ def create_product(request: HttpRequest) -> HttpResponse:
         "form": form
     }
     return render(request, "shopapp/create_product.html", context=context)
+
 
 @login_required
 def create_order(request: HttpRequest) -> HttpResponse:
