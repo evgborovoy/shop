@@ -23,8 +23,10 @@
                             {% endfor %}
                         </ul>
                     </div>
+                    <p><a href="{% url 'shopapp:order_detail' pk=order.pk %}">Details</a></p>
 
                 </div>
+                <br>
             {% endfor %}
         </div>
     {% else %}
