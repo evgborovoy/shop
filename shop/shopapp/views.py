@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
@@ -64,20 +65,29 @@ class OrderDetailView(DetailView):
     queryset = Order.objects.select_related("user").prefetch_related("products")
 
 
-@login_required
-def create_order(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            order = form.save(commit=False)
-            order.user = request.user
-            order.save()
-            form.save_m2m()
-            url = reverse("shopapp:orders_list")
-            return redirect(url)
-    else:
-        form = OrderForm()
-    context = {
-        "form": form
-    }
-    return render(request, "shopapp/create_order.html", context=context)
+class OrderUpdateView(UpdateView):
+    model = Order
+    fields = ["delivery_address", "promocode", "products"]
+    template_name = "shopapp/order_update.html"
+
+    def get_success_url(self):
+        return reverse(
+            "shopapp:order_detail",
+            kwargs={"pk": self.object.pk},
+        )
+
+
+class OrderDeleteView(DeleteView):
+    model = Order
+    success_url = reverse_lazy("shopapp:orders_list")
+
+
+class OrderCreateView(LoginRequiredMixin, CreateView):
+    model = Order
+    fields = ["delivery_address", "promocode", "products"]
+    success_url = reverse_lazy("shopapp:orders_list")
+    template_name = "shopapp/create_order.html"
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
