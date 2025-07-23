@@ -1,6 +1,9 @@
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LogoutView, LoginView
 from django.http import HttpRequest, HttpResponse
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView, CreateView
 
 
 class MyLoginView(LoginView):
@@ -31,3 +34,22 @@ def set_session_view(request: HttpRequest) -> HttpResponse:
 def get_session_view(request: HttpRequest) -> HttpResponse:
     value = request.session.get("foobar", "default session")
     return HttpResponse(f"Session value: {value!r}")
+
+
+class AboutMeView(TemplateView):
+    template_name = "myauth/about_me.html"
+
+
+class RegisterView(CreateView):
+    form_class = UserCreationForm
+    template_name = "myauth/register.html"
+    success_url = reverse_lazy("myauth:about_me")
+
+    # Auto authenticate user after registration
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        username = form.cleaned_data.get("username")
+        password = form.cleaned_data.get("password1")
+        user = authenticate(self.request, username=username, password=password)
+        login(self.request, user=user)
+        return response
