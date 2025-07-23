@@ -9,6 +9,10 @@
     </title>
 </head>
 <body>
+<form action="{% url 'myauth:logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Выйти</button>
+</form>
 {% block body %}
 	
 {% endblock %}
