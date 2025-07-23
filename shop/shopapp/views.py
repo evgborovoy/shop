@@ -1,12 +1,10 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from shopapp.models import Product, Order
-from shopapp.forms import OrderForm
 
 
 def shop_index(request: HttpRequest) -> HttpResponse:
@@ -55,13 +53,14 @@ class ProductDeleteView(DeleteView):
         return HttpResponseRedirect(success_url)
 
 
-class OrdersListView(ListView):
+class OrdersListView(LoginRequiredMixin, ListView):
     queryset = Order.objects.select_related("user").prefetch_related("products")
     context_object_name = "orders"
     template_name = "shopapp/orders_list.html"
 
 
-class OrderDetailView(DetailView):
+class OrderDetailView(PermissionRequiredMixin, DetailView):
+    permission_required = ["shopapp.view_order"]
     queryset = Order.objects.select_related("user").prefetch_related("products")
 
 
