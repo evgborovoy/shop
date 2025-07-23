@@ -65,4 +65,7 @@ class OrderAdmin(admin.ModelAdmin):
         return Order.objects.select_related("user").prefetch_related("products")
 
     def user_verbose(self, obj: Order) -> str:
-        return f"{obj.user.first_name} {obj.user.last_name}" or f"{obj.user.first_name}" or obj.user.username
+        if obj.user.first_name or obj.user.last_name:
+            return f"{obj.user.first_name} {obj.user.last_name}"
+        return obj.user.username
+
