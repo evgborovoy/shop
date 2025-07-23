@@ -10,6 +10,7 @@
         <p>First name: {{ user.first_name }}</p>
         <p>Last name: {{ user.last_name }}</p>
         <p>Email: {{ user.email }}</p>
+        <p>Accept agreement: {{ user.profile.agreement_accepted }}</p>
         <form action="{% url 'myauth:logout' %}" method="post">
             {% csrf_token %}
             <button type="submit">Выйти</button>
