@@ -3,8 +3,8 @@ from django.db import models
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(null=False, blank=True)
+    name = models.CharField(max_length=100, db_index=True)
+    description = models.TextField(null=False, blank=True, db_index=True)
     price = models.DecimalField(default=0, max_digits=10, decimal_places=2)
     discount = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
