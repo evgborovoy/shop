@@ -5,7 +5,10 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter, OrderingFilter
 from .serializers import ProductSerializer, OrderSerializer
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 from shopapp.models import Product, Order
 
@@ -13,11 +16,37 @@ from shopapp.models import Product, Order
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    filter_backends = [
+        SearchFilter,
+        DjangoFilterBackend,
+        OrderingFilter,
+    ]
+    search_fields = ["name", "description"]
+    filterset_fields = [
+        "name",
+        "description",
+        "price",
+        "discount",
+        "archived",
+    ]
+    ordering_fields = ["name", "price"]
 
 
 class OrderViewSet(ModelViewSet):
     queryset = Order.objects.select_related("user").prefetch_related("products").all()
     serializer_class = OrderSerializer
+    filter_backends = [
+        SearchFilter,
+        DjangoFilterBackend,
+    ]
+    search_fields = [
+        "delivery_address",
+        "promocode",
+    ]
+    filterset_fields = [
+        "delivery_address",
+        "promocode",
+    ]
 
 
 def shop_index(request: HttpRequest) -> HttpResponse:
