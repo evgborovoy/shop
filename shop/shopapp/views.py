@@ -1,10 +1,23 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, reverse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+from rest_framework.viewsets import ModelViewSet
+from .serializers import ProductSerializer, OrderSerializer
+
 from shopapp.models import Product, Order
+
+
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+class OrderViewSet(ModelViewSet):
+    queryset = Order.objects.select_related("user").prefetch_related("products").all()
+    serializer_class = OrderSerializer
 
 
 def shop_index(request: HttpRequest) -> HttpResponse:
