@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.shortcuts import render, reverse
@@ -11,6 +12,8 @@ from .serializers import ProductSerializer, OrderSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 
 from shopapp.models import Product, Order
+
+log = logging.getLogger(__name__)
 
 
 class ProductViewSet(ModelViewSet):
